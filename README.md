@@ -2,7 +2,16 @@
 
 ![Workflow](https://github.com/georgmangold/console/actions/workflows/jobs.yaml/badge.svg) ![license](https://img.shields.io/badge/license-AGPL%20V3-blue) ![binarydownloads](https://img.shields.io/github/downloads/georgmangold/console/total?label=GitHub%20Release%20Downloads) ![ghcr](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fghcr-badge.elias.eu.org%2Fapi%2Fgeorgmangold%2Fconsole%2Fconsole&query=downloadCount&logo=refinedgithub&label=ghcr.io%20Container%20Pulls&color=9E95B7)
 
-Console is a graphical admin management browser user interface for [MinIO® Server](https://github.com/minio/minio)
+Console is a graphical admin management browser user interface for [MinIO® Server](https://github.com/minio/minio) and other S3-compatible storage systems.
+
+## ⭐ New Features
+
+- **Multi-Backend Support**: Manage multiple S3-compatible backends (MinIO, Garage, Versity Gateway, AWS S3, etc.) from a single console
+- **Centralized User Management**: Separate admin and S3 users with granular permissions
+- **Garage Cluster Support**: Connect to Garage clusters with automatic load balancing and failover
+- **Backend Health Monitoring**: Real-time health checks for all configured backends
+
+See [Multi-Backend Setup Guide](docs/multi-backend-setup.md) for details.
 
 > [!NOTE]
 > Console is a fork of the old [MinIO Console](https://github.com/minio/object-browser) for my own personal educational purposes, and therefore it incorporates MinIO® source code. You may also want to look for other maintained [forks](https://github.com/minio/object-browser/forks).

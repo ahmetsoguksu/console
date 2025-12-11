@@ -8,6 +8,10 @@ More documentation to read
 - [TLS](TLS.md)
 - [Debug Logging](Debug.md)
 - [Environment Variables](Environment.md)
+- **Multi-Backend Support** ⭐ NEW
+    - [Multi-Backend Setup (English)](multi-backend-setup.md)
+    - [Çoklu Backend Kurulumu (Türkçe)](coklu-backend-kurulumu.md)
+    - [Example Configuration](example-multi-backend-config.sh)
 - **Development**
     - [DEVELOPMENT](../DEVELOPMENT.md)
     - [Frontend Web App](../web-app/README.md)
@@ -53,8 +57,10 @@ Yes, see docs [OIDC](OIDC.md).
 There is no persistent data for the Console, everything is done with environment variables. The only one needed is the URL to the Minio server, i.e. `CONSOLE_MINIO_SERVER`.
 
 ### Can I use this Console as S3 Browser for other S3 Provider?
-No, this Console only works with minio .
-```
-minio-console-1  | ErrorWithContext:The s3 command you requested is not implemented.                                 
-minio-console-1  | %!(EXTRA *errors.errorString=invalid login)
-```
+Yes! With the new multi-backend support, Console can work with multiple S3-compatible services including:
+- MinIO
+- Garage (with cluster support)
+- Versity Gateway
+- Generic S3-compatible services (AWS S3, Wasabi, DigitalOcean Spaces, etc.)
+
+See [Multi-Backend Setup](multi-backend-setup.md) for configuration details.

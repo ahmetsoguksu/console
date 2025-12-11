@@ -82,4 +82,14 @@ const (
 	MinioIdentifyOpenIDRedirectURIDynamic = "MINIO_IDENTITY_OPENID_REDIRECT_URI_DYNAMIC"
 	MinioIdentifyOpenIDScopes             = "MINIO_IDENTITY_OPENID_SCOPES"
 	MinioIdentifyOpenIDClaimUserinfo      = "MINIO_IDENTITY_OPENID_CLAIM_USERINFO"
+
+	// Constants for multi-backend support
+	ConsoleBackends           = "CONSOLE_BACKENDS"
+	ConsoleDefaultBackend     = "CONSOLE_DEFAULT_BACKEND"
+	ConsoleEnableMultiBackend = "CONSOLE_ENABLE_MULTI_BACKEND"
+
+	// Constants for admin user management
+	ConsoleAdminUsername = "CONSOLE_ADMIN_USERNAME"
+	ConsoleAdminPassword = "CONSOLE_ADMIN_PASSWORD"
+	ConsoleAdminEmail    = "CONSOLE_ADMIN_EMAIL"
 )

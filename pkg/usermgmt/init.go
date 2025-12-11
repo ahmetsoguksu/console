@@ -45,10 +45,13 @@ func InitializeAdminUser() error {
 		return fmt.Errorf("error checking for existing admin user: %w", err)
 	}
 	
+	// Get admin email from environment or use default
+	adminEmail := env.Get("CONSOLE_ADMIN_EMAIL", fmt.Sprintf("%s@localhost", adminUsername))
+	
 	// Create admin user
 	req := &CreateUserRequest{
 		Username: adminUsername,
-		Email:    fmt.Sprintf("%s@console.local", adminUsername),
+		Email:    adminEmail,
 		Password: adminPassword,
 		Type:     UserTypeAdmin,
 		Permissions: []string{

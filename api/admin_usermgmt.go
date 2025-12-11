@@ -29,7 +29,7 @@ func CreateAdminUser(ctx context.Context, req *usermgmt.CreateUserRequest) (*use
 	
 	user, err := usermgmt.GlobalUserStorage.CreateUser(ctx, req)
 	if err != nil {
-		return nil, ErrorWithContext(ctx, err)
+		return nil, err
 	}
 	
 	return user, nil
@@ -42,7 +42,7 @@ func CreateS3User(ctx context.Context, req *usermgmt.CreateUserRequest) (*usermg
 	
 	user, err := usermgmt.GlobalUserStorage.CreateUser(ctx, req)
 	if err != nil {
-		return nil, ErrorWithContext(ctx, err)
+		return nil, err
 	}
 	
 	return user, nil
@@ -50,31 +50,17 @@ func CreateS3User(ctx context.Context, req *usermgmt.CreateUserRequest) (*usermg
 
 // GetUser retrieves a user by ID
 func GetUser(ctx context.Context, userID string) (*usermgmt.User, error) {
-	user, err := usermgmt.GlobalUserStorage.GetUser(ctx, userID)
-	if err != nil {
-		return nil, ErrorWithContext(ctx, err)
-	}
-	
-	return user, nil
+	return usermgmt.GlobalUserStorage.GetUser(ctx, userID)
 }
 
 // UpdateUser updates a user
 func UpdateUser(ctx context.Context, userID string, req *usermgmt.UpdateUserRequest) (*usermgmt.User, error) {
-	user, err := usermgmt.GlobalUserStorage.UpdateUser(ctx, userID, req)
-	if err != nil {
-		return nil, ErrorWithContext(ctx, err)
-	}
-	
-	return user, nil
+	return usermgmt.GlobalUserStorage.UpdateUser(ctx, userID, req)
 }
 
 // DeleteUser deletes a user
 func DeleteUser(ctx context.Context, userID string) error {
-	if err := usermgmt.GlobalUserStorage.DeleteUser(ctx, userID); err != nil {
-		return ErrorWithContext(ctx, err)
-	}
-	
-	return nil
+	return usermgmt.GlobalUserStorage.DeleteUser(ctx, userID)
 }
 
 // ListUsers lists users with optional filtering
@@ -86,24 +72,19 @@ func ListUsers(ctx context.Context, userType *usermgmt.UserType, page, pageSize 
 		pageSize = 20
 	}
 	
-	users, err := usermgmt.GlobalUserStorage.ListUsers(ctx, userType, page, pageSize)
-	if err != nil {
-		return nil, ErrorWithContext(ctx, err)
-	}
-	
-	return users, nil
+	return usermgmt.GlobalUserStorage.ListUsers(ctx, userType, page, pageSize)
 }
 
 // AuthenticateAdminUser authenticates an admin user
 func AuthenticateAdminUser(ctx context.Context, username, password string) (*usermgmt.User, error) {
 	user, err := usermgmt.GlobalUserStorage.AuthenticateUser(ctx, username, password)
 	if err != nil {
-		return nil, ErrorWithContext(ctx, err)
+		return nil, err
 	}
 	
 	// Ensure this is an admin user
 	if user.Type != usermgmt.UserTypeAdmin {
-		return nil, ErrorWithContext(ctx, usermgmt.ErrInvalidCredentials)
+		return nil, usermgmt.ErrInvalidCredentials
 	}
 	
 	return user, nil
@@ -111,50 +92,27 @@ func AuthenticateAdminUser(ctx context.Context, username, password string) (*use
 
 // CreateS3UserConfig creates S3 user configuration for a backend
 func CreateS3UserConfig(ctx context.Context, req *usermgmt.CreateS3UserConfigRequest) (*usermgmt.S3UserConfig, error) {
-	config, err := usermgmt.GlobalUserStorage.CreateS3UserConfig(ctx, req)
-	if err != nil {
-		return nil, ErrorWithContext(ctx, err)
-	}
-	
-	return config, nil
+	return usermgmt.GlobalUserStorage.CreateS3UserConfig(ctx, req)
 }
 
 // GetS3UserConfig retrieves S3 user configuration
 func GetS3UserConfig(ctx context.Context, userID, backendID string) (*usermgmt.S3UserConfig, error) {
-	config, err := usermgmt.GlobalUserStorage.GetS3UserConfig(ctx, userID, backendID)
-	if err != nil {
-		return nil, ErrorWithContext(ctx, err)
-	}
-	
-	return config, nil
+	return usermgmt.GlobalUserStorage.GetS3UserConfig(ctx, userID, backendID)
 }
 
 // ListS3UserConfigs lists all S3 configurations for a user
 func ListS3UserConfigs(ctx context.Context, userID string) ([]*usermgmt.S3UserConfig, error) {
-	configs, err := usermgmt.GlobalUserStorage.ListS3UserConfigs(ctx, userID)
-	if err != nil {
-		return nil, ErrorWithContext(ctx, err)
-	}
-	
-	return configs, nil
+	return usermgmt.GlobalUserStorage.ListS3UserConfigs(ctx, userID)
 }
 
 // UpdateS3UserConfig updates S3 user configuration
 func UpdateS3UserConfig(ctx context.Context, userID, backendID string, config *usermgmt.S3UserConfig) error {
-	if err := usermgmt.GlobalUserStorage.UpdateS3UserConfig(ctx, userID, backendID, config); err != nil {
-		return ErrorWithContext(ctx, err)
-	}
-	
-	return nil
+	return usermgmt.GlobalUserStorage.UpdateS3UserConfig(ctx, userID, backendID, config)
 }
 
 // DeleteS3UserConfig deletes S3 user configuration
 func DeleteS3UserConfig(ctx context.Context, userID, backendID string) error {
-	if err := usermgmt.GlobalUserStorage.DeleteS3UserConfig(ctx, userID, backendID); err != nil {
-		return ErrorWithContext(ctx, err)
-	}
-	
-	return nil
+	return usermgmt.GlobalUserStorage.DeleteS3UserConfig(ctx, userID, backendID)
 }
 
 // HasPermission checks if a user has a specific permission

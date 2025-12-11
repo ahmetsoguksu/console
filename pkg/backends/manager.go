@@ -25,6 +25,7 @@ import (
 	"sync"
 
 	"github.com/minio/pkg/v3/env"
+	xnet "github.com/minio/pkg/v3/net"
 )
 
 var (
@@ -38,10 +39,10 @@ var (
 
 // Manager manages multiple S3 backends
 type Manager struct {
-	backends map[string]BackendClient
-	configs  map[string]*BackendConfig
-	mu       sync.RWMutex
-	default  string // ID of default backend
+	backends       map[string]BackendClient
+	configs        map[string]*BackendConfig
+	mu             sync.RWMutex
+	defaultBackend string // ID of default backend
 }
 
 // GlobalBackendManager is the global instance of backend manager
@@ -72,8 +73,8 @@ func (m *Manager) AddBackend(config *BackendConfig, client BackendClient) error 
 	m.configs[config.ID] = config
 
 	// Set as default if it's the first backend
-	if m.default == "" {
-		m.default = config.ID
+	if m.defaultBackend == "" {
+		m.defaultBackend = config.ID
 	}
 
 	return nil
@@ -92,9 +93,9 @@ func (m *Manager) RemoveBackend(id string) error {
 	delete(m.configs, id)
 
 	// If removing default, set new default
-	if m.default == id && len(m.backends) > 0 {
+	if m.defaultBackend == id && len(m.backends) > 0 {
 		for backendID := range m.backends {
-			m.default = backendID
+			m.defaultBackend = backendID
 			break
 		}
 	}
@@ -120,11 +121,11 @@ func (m *Manager) GetDefaultBackend() (BackendClient, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 
-	if m.default == "" {
+	if m.defaultBackend == "" {
 		return nil, ErrNoBackendsConfigured
 	}
 
-	backend, exists := m.backends[m.default]
+	backend, exists := m.backends[m.defaultBackend]
 	if !exists {
 		return nil, ErrBackendNotFound
 	}
@@ -141,7 +142,7 @@ func (m *Manager) SetDefaultBackend(id string) error {
 		return ErrBackendNotFound
 	}
 
-	m.default = id
+	m.defaultBackend = id
 	return nil
 }
 
@@ -246,6 +247,12 @@ func (m *Manager) loadLegacyConfig() error {
 		return ErrNoBackendsConfigured
 	}
 
+	// Determine if secure from endpoint URL
+	secure := false
+	if u, err := xnet.ParseHTTPURL(endpoint); err == nil {
+		secure = u.Scheme == "https"
+	}
+
 	// Create a default backend from legacy config
 	config := &BackendConfig{
 		ID:       "default",
@@ -253,7 +260,7 @@ func (m *Manager) loadLegacyConfig() error {
 		Type:     BackendTypeMinIO,
 		Endpoint: endpoint,
 		Region:   env.Get("CONSOLE_MINIO_REGION", ""),
-		Secure:   true, // Will be determined from endpoint
+		Secure:   secure,
 		Enabled:  true,
 	}
 

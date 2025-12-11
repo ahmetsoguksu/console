@@ -18,9 +18,10 @@ package backends
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
 	"io"
-	"math/rand"
+	"math/big"
 	"strings"
 	"sync"
 	"time"
@@ -122,7 +123,14 @@ func (g *GarageBackend) getRandomClient() *minio.Client {
 		return g.clients[0]
 	}
 	
-	return g.clients[rand.Intn(len(g.clients))]
+	// Use crypto/rand for thread-safe random selection
+	n, err := rand.Int(rand.Reader, big.NewInt(int64(len(g.clients))))
+	if err != nil {
+		// Fallback to round-robin if random fails
+		return g.getClient()
+	}
+	
+	return g.clients[n.Int64()]
 }
 
 // Bucket operations
@@ -192,8 +200,7 @@ func (g *GarageBackend) CopyObject(ctx context.Context, dst minio.CopyDestOption
 
 // Object retention operations (may not be fully supported by Garage)
 func (g *GarageBackend) GetObjectRetention(ctx context.Context, bucketName, objectName, versionID string) (*minio.RetentionMode, *time.Time, error) {
-	mode, retainUntilDate, err := g.getRandomClient().GetObjectRetention(ctx, bucketName, objectName, versionID)
-	return &mode, &retainUntilDate, err
+	return g.getRandomClient().GetObjectRetention(ctx, bucketName, objectName, versionID)
 }
 
 func (g *GarageBackend) PutObjectRetention(ctx context.Context, bucketName, objectName string, opts minio.PutObjectRetentionOptions) error {
@@ -202,8 +209,7 @@ func (g *GarageBackend) PutObjectRetention(ctx context.Context, bucketName, obje
 
 // Object legal hold operations (may not be fully supported by Garage)
 func (g *GarageBackend) GetObjectLegalHold(ctx context.Context, bucketName, objectName string, opts minio.GetObjectLegalHoldOptions) (*minio.LegalHoldStatus, error) {
-	status, err := g.getRandomClient().GetObjectLegalHold(ctx, bucketName, objectName, opts)
-	return &status, err
+	return g.getRandomClient().GetObjectLegalHold(ctx, bucketName, objectName, opts)
 }
 
 func (g *GarageBackend) PutObjectLegalHold(ctx context.Context, bucketName, objectName string, opts minio.PutObjectLegalHoldOptions) error {
@@ -243,8 +249,7 @@ func (g *GarageBackend) SetBucketLifecycle(ctx context.Context, bucketName strin
 
 // Bucket object lock operations (may not be fully supported by Garage)
 func (g *GarageBackend) GetBucketObjectLockConfig(ctx context.Context, bucketName string) (*minio.RetentionMode, *uint, *minio.ValidityUnit, error) {
-	mode, validity, unit, err := g.getRandomClient().GetBucketObjectLockConfig(ctx, bucketName)
-	return &mode, &validity, &unit, err
+	return g.getRandomClient().GetBucketObjectLockConfig(ctx, bucketName)
 }
 
 func (g *GarageBackend) SetObjectLockConfig(ctx context.Context, bucketName string, mode *minio.RetentionMode, validity *uint, unit *minio.ValidityUnit) error {

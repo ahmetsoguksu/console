@@ -138,8 +138,7 @@ func (m *MinIOBackend) CopyObject(ctx context.Context, dst minio.CopyDestOptions
 
 // Object retention operations
 func (m *MinIOBackend) GetObjectRetention(ctx context.Context, bucketName, objectName, versionID string) (*minio.RetentionMode, *time.Time, error) {
-	mode, retainUntilDate, err := m.client.GetObjectRetention(ctx, bucketName, objectName, versionID)
-	return &mode, &retainUntilDate, err
+	return m.client.GetObjectRetention(ctx, bucketName, objectName, versionID)
 }
 
 func (m *MinIOBackend) PutObjectRetention(ctx context.Context, bucketName, objectName string, opts minio.PutObjectRetentionOptions) error {
@@ -148,8 +147,7 @@ func (m *MinIOBackend) PutObjectRetention(ctx context.Context, bucketName, objec
 
 // Object legal hold operations
 func (m *MinIOBackend) GetObjectLegalHold(ctx context.Context, bucketName, objectName string, opts minio.GetObjectLegalHoldOptions) (*minio.LegalHoldStatus, error) {
-	status, err := m.client.GetObjectLegalHold(ctx, bucketName, objectName, opts)
-	return &status, err
+	return m.client.GetObjectLegalHold(ctx, bucketName, objectName, opts)
 }
 
 func (m *MinIOBackend) PutObjectLegalHold(ctx context.Context, bucketName, objectName string, opts minio.PutObjectLegalHoldOptions) error {
@@ -189,8 +187,7 @@ func (m *MinIOBackend) SetBucketLifecycle(ctx context.Context, bucketName string
 
 // Bucket object lock operations
 func (m *MinIOBackend) GetBucketObjectLockConfig(ctx context.Context, bucketName string) (*minio.RetentionMode, *uint, *minio.ValidityUnit, error) {
-	mode, validity, unit, err := m.client.GetBucketObjectLockConfig(ctx, bucketName)
-	return &mode, &validity, &unit, err
+	return m.client.GetBucketObjectLockConfig(ctx, bucketName)
 }
 
 func (m *MinIOBackend) SetObjectLockConfig(ctx context.Context, bucketName string, mode *minio.RetentionMode, validity *uint, unit *minio.ValidityUnit) error {

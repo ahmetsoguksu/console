@@ -60,16 +60,16 @@ func AddBackend(ctx context.Context, req *backends.BackendConfig) error {
 	case backends.BackendTypeS3:
 		client, err = backends.NewS3Backend(req)
 	default:
-		return ErrorWithContext(ctx, ErrInvalidArgument)
+		return ErrBadRequest
 	}
 
 	if err != nil {
-		return ErrorWithContext(ctx, err)
+		return err
 	}
 
 	// Add to manager
 	if err := backends.GlobalBackendManager.AddBackend(req, client); err != nil {
-		return ErrorWithContext(ctx, err)
+		return err
 	}
 
 	return nil
@@ -77,18 +77,12 @@ func AddBackend(ctx context.Context, req *backends.BackendConfig) error {
 
 // RemoveBackend removes a backend from the system
 func RemoveBackend(ctx context.Context, backendID string) error {
-	if err := backends.GlobalBackendManager.RemoveBackend(backendID); err != nil {
-		return ErrorWithContext(ctx, err)
-	}
-	return nil
+	return backends.GlobalBackendManager.RemoveBackend(backendID)
 }
 
 // SetDefaultBackend sets the default backend
 func SetDefaultBackend(ctx context.Context, backendID string) error {
-	if err := backends.GlobalBackendManager.SetDefaultBackend(backendID); err != nil {
-		return ErrorWithContext(ctx, err)
-	}
-	return nil
+	return backends.GlobalBackendManager.SetDefaultBackend(backendID)
 }
 
 // BackendResponse wraps backend configuration for API responses
@@ -131,14 +125,8 @@ func ConvertBackendToResponse(config *backends.BackendConfig, healthy bool) *Bac
 
 // getBackendFromSession retrieves backend ID from session or uses default
 func getBackendFromSession(session *models.Principal) (string, error) {
-	// Check if session has backend preference
-	if session.CustomClaims != nil {
-		if backendID, ok := session.CustomClaims["backendId"].(string); ok && backendID != "" {
-			return backendID, nil
-		}
-	}
-	
-	// Use default backend
+	// For now, always use default backend
+	// TODO: Add backend preference to session/token
 	backend, err := backends.GlobalBackendManager.GetDefaultBackend()
 	if err != nil {
 		return "", err
@@ -176,13 +164,13 @@ type BackendConfigRequest struct {
 // ValidateBackendConfig validates backend configuration
 func ValidateBackendConfig(req *BackendConfigRequest) error {
 	if req.Name == "" {
-		return ErrInvalidArgument
+		return ErrBadRequest
 	}
 	if req.Endpoint == "" {
-		return ErrInvalidArgument
+		return ErrBadRequest
 	}
 	if req.Type == "" {
-		return ErrInvalidArgument
+		return ErrBadRequest
 	}
 	
 	// Validate backend type
@@ -191,7 +179,7 @@ func ValidateBackendConfig(req *BackendConfigRequest) error {
 	     backends.BackendTypeVersity, backends.BackendTypeS3:
 		// Valid types
 	default:
-		return ErrInvalidArgument
+		return ErrBadRequest
 	}
 	
 	return nil

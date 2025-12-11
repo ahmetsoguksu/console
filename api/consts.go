@@ -91,4 +91,5 @@ const (
 	// Constants for admin user management
 	ConsoleAdminUsername = "CONSOLE_ADMIN_USERNAME"
 	ConsoleAdminPassword = "CONSOLE_ADMIN_PASSWORD"
+	ConsoleAdminEmail    = "CONSOLE_ADMIN_EMAIL"
 )

@@ -227,10 +227,11 @@ func (s *MemoryStorage) ListUsers(ctx context.Context, userType *UserType, page,
 
 // AuthenticateUser authenticates a user
 func (s *MemoryStorage) AuthenticateUser(ctx context.Context, username, password string) (*User, error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
+	// Use read lock for user lookup
+	s.mu.RLock()
 	user, exists := s.usersByName[username]
+	s.mu.RUnlock()
+	
 	if !exists {
 		return nil, ErrInvalidCredentials
 	}
@@ -240,9 +241,11 @@ func (s *MemoryStorage) AuthenticateUser(ctx context.Context, username, password
 		return nil, ErrInvalidCredentials
 	}
 
-	// Update last login
+	// Update last login with write lock
+	s.mu.Lock()
 	now := time.Now()
 	user.LastLogin = &now
+	s.mu.Unlock()
 
 	return user, nil
 }
